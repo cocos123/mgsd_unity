@@ -1,0 +1,11 @@
+{
+  "name": "com.mustgames.mgsd",
+  "displayName": "MGSD",
+  "version": "1.0.0",
+  "unity": "2021.3",
+  "description": "MustGames Stable Diffusion package",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1",
+    "com.unity.editorcoroutines": "1.0.0"
+  }
+}
