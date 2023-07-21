@@ -16,7 +16,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 using System.Threading.Tasks;
-namespace MustGames
+namespace MustGames.MGSD.Editor
 {
     public class MGIGSavedData
     {

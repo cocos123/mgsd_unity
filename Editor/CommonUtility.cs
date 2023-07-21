@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
 
-namespace MustGames {
+namespace MustGames.MGSD.Editor {
 	
 	public static class CommonUtility {
 	
