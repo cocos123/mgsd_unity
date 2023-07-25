@@ -37,6 +37,7 @@ namespace MustGames.MGSD.Editor
     {
         public string prompt_name;
         public string prompt_explain;
+        public string recommend_prompt;
     }
 
 
@@ -166,7 +167,7 @@ namespace MustGames.MGSD.Editor
 
                 key = EditorGUILayout.PasswordField("Key", key);
 
-                if (GUILayout.Button("Request Login"))
+                if (GUILayout.Button("Request Login", GUILayout.Height(70)))
                 {
                     EditorCoroutineUtility.StartCoroutine(RequestPromptList(), this);
                 }
@@ -228,7 +229,7 @@ namespace MustGames.MGSD.Editor
                 bUnLimitedGen = EditorGUILayout.Toggle("무한 생성", bUnLimitedGen);
 
 
-                if (GUILayout.Button("Generate Image"))
+                if (GUILayout.Button("Generate Image", GUILayout.Height(70)))
                 {
                     EditorCoroutineUtility.StartCoroutine(GenerateAsync(), this);
                 }
@@ -335,6 +336,7 @@ namespace MustGames.MGSD.Editor
                         {
                             prompts[i] = promptList.prompt[i].prompt_name;
                             promptExplain[i] = promptList.prompt[i].prompt_explain;
+                            extraPrompt = promptList.prompt[i].recommend_prompt;
                         }
                     }
 
@@ -371,7 +373,7 @@ namespace MustGames.MGSD.Editor
 
             while (_updateProgressRunning != null && progressIG < 100)
             {
-                progressIG += 3;
+                progressIG = Mathf.Min(progressIG + 3, 100);
                 float progress = (float)progressIG * 0.01f;
                 EditorUtility.DisplayProgressBar("Generation in progress ", progressIG + "%", progress);
 
