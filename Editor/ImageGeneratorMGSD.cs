@@ -83,8 +83,15 @@ namespace MustGames.MGSD.Editor
         bool bInit = false;
 
         int promptIndex = 0;
+        int recommendIndex = 0;
         string[] prompts;
         string[] promptExplain;
+        string[] recommendPrompt;
+
+
+        string[] recommendPrompts;
+
+
 
         Texture2D texture = null;
 
@@ -151,6 +158,19 @@ namespace MustGames.MGSD.Editor
             file.Close();
         }
 
+        void parseRecommendPrompts(int inPromptIndex)
+        {
+            string wholeStr = recommendPrompts[inPromptIndex];
+            if (wholeStr.Length > 0)
+            {
+                recommendPrompt = wholeStr.Split(';');
+            }
+            else
+            {
+                recommendPrompt = null;
+            }
+
+        }
 
         void OnGUI()
         {
@@ -207,11 +227,27 @@ namespace MustGames.MGSD.Editor
                 if (prompts != null)
                 {
                     EditorGUILayout.BeginHorizontal();
+                    int prevIndex = promptIndex;
                     promptIndex = EditorGUILayout.Popup("Prompt", promptIndex, prompts);
+                    if (prevIndex != promptIndex)
+                    {
+                        recommendIndex = 0;
+                        parseRecommendPrompts(promptIndex);
+                    }
                     EditorGUILayout.EndHorizontal();
                     if (promptExplain != null && promptExplain.Length > 0)
                     {
                         EditorGUILayout.LabelField(promptExplain[promptIndex]);
+                    }
+                    if (recommendPrompt != null)
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                        recommendIndex = EditorGUILayout.Popup("recommend Prompt", recommendIndex, recommendPrompt);
+                        if (GUILayout.Button("use recommend", GUILayout.Height(30)))
+                        {
+                            extraPrompt = recommendPrompt[recommendIndex];
+                        }
+                        EditorGUILayout.EndHorizontal();
                     }
                 }
 
@@ -288,7 +324,7 @@ namespace MustGames.MGSD.Editor
                     byte[] jsonToSend = new System.Text.UTF8Encoding().GetBytes(json);
                     request.uploadHandler = new UploadHandlerRaw(jsonToSend);
                 }
-                request.timeout = 120;
+                request.timeout = 40;
                 request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
 
                 request.SetRequestHeader("user", user);
@@ -332,13 +368,16 @@ namespace MustGames.MGSD.Editor
                     {
                         prompts = new string[promptList.prompt.Length];
                         promptExplain = new string[promptList.prompt.Length];
+                        recommendPrompts = new string[promptList.prompt.Length];
                         for (int i = 0; i < promptList.prompt.Length; ++i)
                         {
                             prompts[i] = promptList.prompt[i].prompt_name;
                             promptExplain[i] = promptList.prompt[i].prompt_explain;
-                            extraPrompt = promptList.prompt[i].recommend_prompt;
+                            recommendPrompts[i] = promptList.prompt[i].recommend_prompt;
                         }
                     }
+
+                    parseRecommendPrompts(promptIndex);
 
 
                     switch (promptList.grade)
@@ -501,7 +540,7 @@ namespace MustGames.MGSD.Editor
                                 EditorCoroutineUtility.StartCoroutine(GenerateAsync(), this);
                             }
                         }
-                    }                    
+                    }
                 }
             }
         }
