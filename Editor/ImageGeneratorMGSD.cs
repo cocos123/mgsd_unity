@@ -71,7 +71,7 @@ namespace MustGames.MGSD.Editor
         string key;
         string filename;
 
-
+        int gradeType = 0;
         string grade;
         string expireTime;
         int genCount;
@@ -100,7 +100,11 @@ namespace MustGames.MGSD.Editor
         string extraPrompt;
         string extraNPrompt;
 
+        int remainGenCount = 10;
+
         bool bUnLimitedGen = false;
+
+        bool bGenTenTimes = false;
 
         readonly GenerateMGIGAPI promptAPI = new GenerateMGIGAPI();
 
@@ -262,11 +266,24 @@ namespace MustGames.MGSD.Editor
                 EditorGUILayout.Space();
                 EditorGUILayout.Space();
 
+                EditorGUILayout.BeginHorizontal();
+                bool bPrevGen = bUnLimitedGen;
                 bUnLimitedGen = EditorGUILayout.Toggle("무한 생성", bUnLimitedGen);
-
+                if (bPrevGen != bUnLimitedGen)
+                {
+                    bGenTenTimes = false;
+                }
+                bPrevGen = bGenTenTimes;
+                bGenTenTimes = EditorGUILayout.Toggle("10개 생성", bGenTenTimes);
+                if (bGenTenTimes != bPrevGen)
+                {
+                    bUnLimitedGen = false;
+                }
+                EditorGUILayout.EndHorizontal();
 
                 if (GUILayout.Button("Generate Image", GUILayout.Height(70)))
                 {
+                    remainGenCount = 10;
                     EditorCoroutineUtility.StartCoroutine(GenerateAsync(), this);
                 }
 
@@ -379,7 +396,7 @@ namespace MustGames.MGSD.Editor
 
                     parseRecommendPrompts(promptIndex);
 
-
+                    gradeType = promptList.grade;
                     switch (promptList.grade)
                     {
                         case 0:
@@ -533,13 +550,22 @@ namespace MustGames.MGSD.Editor
                         EditorCoroutineUtility.StartCoroutine(RequestPromptList(), this);
 
 
-                        if (bUnLimitedGen)
+                        if (bUnLimitedGen && (remainCount > 0 || limitation == 0))
                         {
                             if (ImageGeneratorMGSD.HasOpenInstances<ImageGeneratorMGSD>())
                             {
                                 EditorCoroutineUtility.StartCoroutine(GenerateAsync(), this);
                             }
                         }
+                        else if (bGenTenTimes && remainGenCount > 0 && (remainCount > 0 || limitation == 0))
+                        {
+                            remainGenCount--;
+                            if (ImageGeneratorMGSD.HasOpenInstances<ImageGeneratorMGSD>())
+                            {
+                                EditorCoroutineUtility.StartCoroutine(GenerateAsync(), this);
+                            }
+                        }
+
                     }
                 }
             }
